@@ -19,13 +19,14 @@ public final List<Ticket> TICKET_LIST = new ArrayList<>();
     public TicketController(){
         int ticketId = 1;
         TICKET_LIST.add(new Ticket(ticketId++, "Chakriya", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
-        TICKET_LIST.add(new Ticket(ticketId++, "Chakriya", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
-        TICKET_LIST.add(new Ticket(ticketId++, "Chakriya", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
-        TICKET_LIST.add(new Ticket(ticketId++, "Chakriya", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
+        TICKET_LIST.add(new Ticket(ticketId++, "Theara", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
+        TICKET_LIST.add(new Ticket(ticketId++, "Malis", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
+        TICKET_LIST.add(new Ticket(ticketId++, "Phalla", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
+        TICKET_LIST.add(new Ticket(ticketId++, "Sopheavy", LocalDate.of(2026,11,3), "PP", "Kompot", 1000.0, "Paid", "Booked", 1));
     }
 
     @PostMapping()
-    public Ticket addTdicket(@RequestBody Ticket ticket){
+    public Ticket addTicket(@RequestBody Ticket ticket){
         TICKET_LIST.add(ticket);
         return ticket;
     }
@@ -79,6 +80,47 @@ public final List<Ticket> TICKET_LIST = new ArrayList<>();
         );
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchTicket(@RequestParam String passengerName){
+        List<Ticket> ticketList = new ArrayList<>();
+        for(Ticket ticket : TICKET_LIST){
+            if(ticket.getPassengerName().equals(passengerName)){
+                ticketList.add(ticket);
+            }
+        }
+        if (ticketList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ApiResponse<>(
+                            "false",
+                            "\"Internal Server Error",
+                            "500",
+                            null,
+                            LocalDateTime.now()
+                    )
+            );
+        }
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        "true",
+                        "string",
+                        "100 CONTINUE",
+                        ticketList,
+                        LocalDateTime.now()
+                )
+        );
+    };
+
+    @GetMapping("/filter")
+    public List<Ticket> filterTicket(TicketStatus ticketStatus, int travelDate){
+        List<Ticket> ticketList = new ArrayList<>();
+        for(Ticket ticket : TICKET_LIST){
+            if(ticket.getTicketStatus().equals(ticketStatus) && ticket.getTravelDate().equals(travelDate)){
+                ticketList.add(ticket);
+            }
+        }
+        return ticketList;
+    }
+
     @PutMapping("/{ticket-id}")
     public Ticket updateTicket(@PathVariable("ticket-id") Integer id, @RequestBody Ticket ticket)
     {
@@ -97,6 +139,11 @@ public final List<Ticket> TICKET_LIST = new ArrayList<>();
             }
         }
         return null;
+    }
+
+    @DeleteMapping("/{ticket-id}")
+    public void deleteTicket(@PathVariable("ticket-id") Integer id){
+        TICKET_LIST.removeIf(ticket -> ticket.getTicketId().equals(id) );
     }
 
     @PutMapping("/bulk")
@@ -119,49 +166,6 @@ public final List<Ticket> TICKET_LIST = new ArrayList<>();
         );
     }
 
-    @DeleteMapping("/{ticket-id}")
-    public void deleteTicket(@PathVariable("ticket-id") Integer id){
-        TICKET_LIST.removeIf(ticket -> ticket.getTicketId().equals(id) );
-    }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> searchTicket(@RequestParam String passengerName){
-        List<Ticket> ticketList = new ArrayList<>();
-        for(Ticket ticket : TICKET_LIST){
-            if(ticket.getPassengerName().equals(passengerName)){
-                ticketList.add(ticket);
-            }
-        }
-       if (ticketList.isEmpty()){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                  new ApiResponse<>(
-                          "false",
-                          "\"Internal Server Error",
-                          "500",
-                          null,
-                          LocalDateTime.now()
-                  )
-                  );
-       }
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        "true",
-                        "string",
-                        "100 CONTINUE",
-                        ticketList,
-                        LocalDateTime.now()
-                )
-        );
-    };
 
-    @GetMapping("/filter")
-    public List<Ticket> filterTicket(TicketStatus ticketStatus, int travelDate){
-        List<Ticket> ticketList = new ArrayList<>();
-        for(Ticket ticket : TICKET_LIST){
-            if(ticket.getTicketStatus().equals(ticketStatus) && ticket.getTravelDate().equals(travelDate)){
-                ticketList.add(ticket);
-            }
-        }
-        return ticketList;
-    }
 }
