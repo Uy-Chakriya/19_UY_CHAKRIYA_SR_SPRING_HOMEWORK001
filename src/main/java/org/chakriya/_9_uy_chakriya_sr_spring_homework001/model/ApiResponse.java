@@ -15,5 +15,7 @@ public class ApiResponse<T> {
     private String status;
     private T payload;
     private LocalDateTime timestamp;
+//    private String error;
+//    private String path;
 
 }
